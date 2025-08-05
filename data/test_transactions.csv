@@ -1,0 +1,8 @@
+amount,description,category,transaction_type
+25.50,Lunch at restaurant,food,expense
+3000.00,Monthly salary,salary,income
+15.99,Netflix subscription,entertainment,expense
+120.00,Grocery shopping,food,expense
+45.00,Gas station,transport,expense
+2500.00,Freelance project,freelance,income
+8.99,Coffee shop,food,expense

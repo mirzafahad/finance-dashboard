@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Finance Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>💰 Personal Finance Dashboard</h1>
+            <div class="header-actions">
+                <button id="refreshBtn" class="btn btn-secondary">🔄 Refresh</button>
+            </div>
+        </header>
+
+        <!-- Dashboard Summary Cards -->
+        <section class="summary-section">
+            <div class="summary-cards">
+                <div class="card income-card">
+                    <div class="card-header">
+                        <h3>Total Income</h3>
+                        <span class="icon">💵</span>
+                    </div>
+                    <div class="card-value" id="totalIncome">$0.00</div>
+                </div>
+                <div class="card expense-card">
+                    <div class="card-header">
+                        <h3>Total Expenses</h3>
+                        <span class="icon">💸</span>
+                    </div>
+                    <div class="card-value" id="totalExpenses">$0.00</div>
+                </div>
+                <div class="card net-worth-card">
+                    <div class="card-header">
+                        <h3>Net Worth</h3>
+                        <span class="icon">📊</span>
+                    </div>
+                    <div class="card-value" id="netWorth">$0.00</div>
+                </div>
+                <div class="card count-card">
+                    <div class="card-header">
+                        <h3>Transactions</h3>
+                        <span class="icon">📋</span>
+                    </div>
+                    <div class="card-value" id="transactionCount">0</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Charts Section -->
+        <section class="charts-section">
+            <div class="charts-grid">
+                <div class="chart-container">
+                    <h3>Spending by Category</h3>
+                    <canvas id="categoryChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3>Income vs Expenses</h3>
+                    <canvas id="incomeExpenseChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Actions Section -->
+        <section class="actions-section">
+            <div class="actions-grid">
+                <!-- Add Transaction -->
+                <div class="action-card">
+                    <h3>Add New Transaction</h3>
+                    <form id="transactionForm">
+                        <div class="form-group">
+                            <label for="amount">Amount</label>
+                            <input type="number" id="amount" name="amount" step="0.01" min="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="description">Description</label>
+                            <input type="text" id="description" name="description" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="category">Category</label>
+                            <select id="category" name="category" required>
+                                <option value="">Choose a category</option>
+                                <!-- Income Categories -->
+                                <optgroup label="Income">
+                                    <option value="salary">Salary</option>
+                                    <option value="freelance">Freelance</option>
+                                    <option value="investment">Investment</option>
+                                    <option value="other_income">Other Income</option>
+                                </optgroup>
+                                <!-- Expense Categories -->
+                                <optgroup label="Expenses">
+                                    <option value="food">Food</option>
+                                    <option value="transport">Transport</option>
+                                    <option value="entertainment">Entertainment</option>
+                                    <option value="utilities">Utilities</option>
+                                    <option value="rent">Rent</option>
+                                    <option value="shopping">Shopping</option>
+                                    <option value="healthcare">Healthcare</option>
+                                    <option value="education">Education</option>
+                                    <option value="other_expense">Other Expense</option>
+                                </optgroup>
+                                <!-- Transfer -->
+                                <optgroup label="Transfer">
+                                    <option value="transfer">Transfer</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="transactionType">Type</label>
+                            <select id="transactionType" name="transactionType" required>
+                                <option value="">Choose type</option>
+                                <option value="income">Income</option>
+                                <option value="expense">Expense</option>
+                                <option value="transfer">Transfer</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add Transaction</button>
+                    </form>
+                </div>
+
+                <!-- CSV Upload -->
+                <div class="action-card">
+                    <h3>Upload CSV</h3>
+                    <div class="upload-section">
+                        <div class="upload-info">
+                            <p><strong>Required CSV columns:</strong></p>
+                            <ul>
+                                <li>amount</li>
+                                <li>description</li>
+                                <li>category</li>
+                                <li>transaction_type</li>
+                            </ul>
+                        </div>
+                        <form id="csvUploadForm">
+                            <div class="file-input-wrapper">
+                                <input type="file" id="csvFile" accept=".csv" required>
+                                <label for="csvFile" class="file-label">Choose CSV File</label>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Upload CSV</button>
+                        </form>
+                        <div id="uploadResult" class="upload-result hidden"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Transactions List -->
+        <section class="transactions-section">
+            <div class="transactions-header">
+                <h3>Recent Transactions</h3>
+                <div class="transactions-controls">
+                    <input type="text" id="searchTransactions" placeholder="Search transactions...">
+                    <select id="filterCategory">
+                        <option value="">All Categories</option>
+                        <option value="salary">Salary</option>
+                        <option value="freelance">Freelance</option>
+                        <option value="investment">Investment</option>
+                        <option value="other_income">Other Income</option>
+                        <option value="food">Food</option>
+                        <option value="transport">Transport</option>
+                        <option value="entertainment">Entertainment</option>
+                        <option value="utilities">Utilities</option>
+                        <option value="rent">Rent</option>
+                        <option value="shopping">Shopping</option>
+                        <option value="healthcare">Healthcare</option>
+                        <option value="education">Education</option>
+                        <option value="other_expense">Other Expense</option>
+                        <option value="transfer">Transfer</option>
+                    </select>
+                </div>
+            </div>
+            <div class="transactions-list" id="transactionsList">
+                <!-- Transactions will be loaded here -->
+            </div>
+        </section>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay hidden">
+        <div class="loading-spinner"></div>
+        <p>Loading...</p>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
